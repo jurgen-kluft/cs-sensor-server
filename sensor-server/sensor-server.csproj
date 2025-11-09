@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>1.0.0.0</Version>
+    <Copyright>Copyright (c) 2019-2025 </Copyright>
+    <RepositoryUrl>https://github.com/jurgen-kluft/cs-sensor-server</RepositoryUrl>
+    <Description></Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/jurgen-kluft/cs-sensor-server</PackageProjectUrl>
+    <PackageTags>async;client;server;tcp;udp;low latency;performance</PackageTags>
+  </PropertyGroup>
+
+</Project>

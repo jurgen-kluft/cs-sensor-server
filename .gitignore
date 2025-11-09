@@ -1,0 +1,34 @@
+#ignore all files
+*
+!*/
+
+target/
+sensor-server/bin/
+sensor-server/obj/
+
+#except the following files
+!.gitignore
+
+!*.cpp
+!*.hpp
+!*.c
+!*.h
+!*.inl
+
+!*.cs
+!*.csproj
+
+!*.go
+!*.md
+
+!*.json
+!*.txt
+!LICENSE
+
+!*.pl
+!*.py
+
+!*.ini
+!*.bat
+
+#except the following folders
