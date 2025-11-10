@@ -1,6 +1,8 @@
 # C#
 
-I believe we should move the sensor server from Golang to C#/.NET for the following reasons:
+NOTE: Work in progress, nothing to see here, move along.
+
+Move the sensor server from Golang to C#/.NET for the following reasons:
 
 - It can do UDP, TCP, and Unix Domain Sockets
 - It can do memory mapped file I/O
