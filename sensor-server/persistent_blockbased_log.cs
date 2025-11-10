@@ -30,42 +30,46 @@ namespace sensorserver
     // a single large memory-mapped file for efficient access and storage.
     public class StreamBlockLog
     {
-		private static readonly long sLogHeaderSize = 32;
-		private static readonly long sMaxBlockCount = 32 * 1024;
-		private static readonly long sBlockHeaderSize = 64;
-		private static readonly long sSizeOfTocEntry = 32;
-		private static readonly long sSizeOfToc = sMaxBlockCount * sSizeOfTocEntry;
-		
+        private static readonly long sLogHeaderSize = 32;
+        private static readonly long sMaxBlockCount = 32 * 1024;
+        private static readonly long sBlockHeaderSize = 64;
+        private static readonly long sSizeOfTocEntry = 32;
+        private static readonly long sSizeOfToc = sMaxBlockCount * sSizeOfTocEntry;
+
+        private readonly string sFilePath;
+        private readonly long sMaxSize;
         private readonly MemoryMappedFile mMemoryMappedFile;
         private readonly MemoryMappedViewAccessor mAccessor;
-        private readonly long sMaxSize;
         private long mBlockCount;
         private long mAppendCursor;
 
         public readonly struct BlockId
         {
             public readonly byte[] Data = new byte[16];
-			public BlockId()
-			{
-			}
-		}
+            public BlockId()
+            {
+            }
+        }
         private struct BlockInfo
         {
-            public Int64 Offset {  get; set; }
+            public Int64 Offset { get; set; }
             public Int64 Size { get; set; }
         }
-		private readonly Dictionary<BlockId, BlockInfo> mBlockOffsetMap;
+        private readonly Dictionary<BlockId, BlockInfo> mBlockOffsetMap;
 
-		public StreamBlockLog(string filePath, long maxSize)
+        public StreamBlockLog(string filePath, long maxSize)
         {
             // Create the file on disk if it doesn't exist and fill it with zeros
             sMaxSize = maxSize;
+            sFilePath = filePath;
+        }
 
-            FileStream fs = new(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-            fs.SetLength(maxSize);
-            fs.Close();
+        public bool OpenReadWrite()
+        {
+            FileStream fileStream = new(sFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            fileStream.SetLength(maxSize);
 
-            mMemoryMappedFile = MemoryMappedFile.CreateFromFile(filePath, FileMode.OpenOrCreate, null, sMaxSize);
+            mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.ReadWrite);
 
             mBlockCount = mAccessor.ReadInt64(0); // Read block count at start of file
@@ -76,6 +80,24 @@ namespace sensorserver
                 mAppendCursor = sLogHeaderSize + sSizeOfToc; // Initialize append cursor after header and TOC
             }
 
+            ReadTocEntries();
+        }
+
+        public bool OpenReadOnly()
+        {
+            FileStream fileStream = new(sFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
+            mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.Read);
+
+            mBlockCount = mAccessor.ReadInt64(0); // Read block count at start of file
+            
+            ReadTocEntries();
+
+            return true;
+        }
+
+        private void ReadTocEntries()
+        {
             // Read the TOC entries
             mBlockOffsetMap = [];
             for (long i = 0; i < mBlockCount; i++)
@@ -88,7 +110,7 @@ namespace sensorserver
                     Size = mAccessor.ReadInt64(tocOffset + 24)
                 };
                 mBlockOffsetMap[tocEntry] = blockInfo;
-            }
+            }            
         }
 
         private void Flush()
@@ -120,9 +142,9 @@ namespace sensorserver
 
         public bool BlockWriteAt(BlockId blockId, long blockOffset, byte[] data, long dataOffset, long dataLength)
         {
-			if (mBlockOffsetMap.TryGetValue(blockId, out var blockInfo))
-			{
-				if (blockOffset < 0 || dataLength < 0 || dataOffset < 0 || (blockOffset + dataLength) > blockInfo.Size)
+            if (mBlockOffsetMap.TryGetValue(blockId, out var blockInfo))
+            {
+                if (blockOffset < 0 || dataLength < 0 || dataOffset < 0 || (blockOffset + dataLength) > blockInfo.Size)
                 {
                     return false;
                 }

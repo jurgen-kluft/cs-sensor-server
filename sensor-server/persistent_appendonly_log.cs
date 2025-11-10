@@ -8,23 +8,26 @@ namespace sensorserver
     //     facilitate debugging and analysis of incoming data. We are also
     //     later able to reconstruct the sensor blocks from the packet log.
     //
-    public class PersistentAppendLog
+    public class PersistentAppendOnlyLog
     {
         private readonly MemoryMappedFile mMemoryMappedFile;
         private readonly MemoryMappedViewAccessor mAccessor;
+        private readonly string sFilePath;
         private readonly long sMaxSize;
         private long mWriteCursor;
 
-        public PersistentAppendLog(string filePath, long maxSize)
+        public PersistentAppendOnlyLog(string filePath, long maxSize)
         {
-            // Create the file on disk if it doesn't exist and fill it with zeros
+            sFilePath = filePath;
             sMaxSize = maxSize;
+        }
 
-            FileStream fs = new(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-            fs.SetLength(maxSize);
-            fs.Close();
+        public bool OpenReadWrite()
+        {
+            FileStream fileStream = new(sFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            fileStream.SetLength(maxSize);
 
-            mMemoryMappedFile = MemoryMappedFile.CreateFromFile(filePath, FileMode.OpenOrCreate, null, sMaxSize);
+            mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.ReadWrite);
 
             mWriteCursor = mAccessor.ReadInt64(0); // Read write cursor at start of file
@@ -32,6 +35,14 @@ namespace sensorserver
             {
                 mWriteCursor = 8; // Initialize write cursor after header
             }
+        }
+
+        public bool OpenReadOnly()
+        {
+            FileStream fileStream = new(sFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
+            mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.Read);
+            return true;
         }
 
         private void Flush()
