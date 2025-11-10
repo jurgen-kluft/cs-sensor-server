@@ -3,6 +3,10 @@
 !*/
 
 target/
+log-reader/bin/
+log-reader/obj/
+log-writer/bin/
+log-writer/obj/
 sensor-server/bin/
 sensor-server/obj/
 

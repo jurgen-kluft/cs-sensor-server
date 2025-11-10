@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// Conversion metrics utilities

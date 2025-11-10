@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// TCP client is used to read/write data from/into the connected TCP server

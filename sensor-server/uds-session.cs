@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// Unix Domain Socket session is used to read and write data from the connected Unix Domain Socket client

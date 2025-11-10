@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// TCP server is used to connect, disconnect and manage TCP sessions
@@ -257,38 +257,21 @@ namespace NetCoreServer
             if (!IsStarted)
                 return false;
 
-            // Stop accepting new clients
             IsAccepting = false;
-
-            // Reset acceptor event arg
             _acceptorEventArg.Completed -= OnAsyncCompleted;
-
-            // Call the server stopping handler
             OnStopping();
 
             try
             {
-                // Close the acceptor socket
                 _acceptorSocket.Close();
-
-                // Dispose the acceptor socket
                 _acceptorSocket.Dispose();
-
-                // Dispose event arguments
                 _acceptorEventArg.Dispose();
-
-                // Update the acceptor socket disposed flag
                 IsSocketDisposed = true;
             }
             catch (ObjectDisposedException) {}
 
-            // Disconnect all sessions
             DisconnectAll();
-
-            // Update the started flag
             IsStarted = false;
-
-            // Call the server stopped handler
             OnStopped();
 
             return true;

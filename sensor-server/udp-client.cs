@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// UDP client is used to read/write data from/into the connected UDP server

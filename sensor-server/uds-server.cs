@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// Unix Domain Socket server is used to connect, disconnect and manage Unix Domain Socket sessions

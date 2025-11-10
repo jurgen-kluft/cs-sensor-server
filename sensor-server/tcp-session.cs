@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// TCP session is used to read and write data from the connected TCP client

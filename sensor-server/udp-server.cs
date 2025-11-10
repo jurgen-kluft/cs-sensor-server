@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// UDP server is used to send or multicast datagrams to UDP endpoints

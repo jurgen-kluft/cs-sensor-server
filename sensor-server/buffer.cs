@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// Dynamic byte buffer

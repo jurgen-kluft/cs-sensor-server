@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace NetCoreServer
+namespace sensorserver
 {
     /// <summary>
     /// String extensions utility class.
