@@ -49,7 +49,7 @@ namespace sensorserver
             return true;
         }
 
-        public bool Read(byte[] data, long dataOffset, long dataLength)
+        public bool Read(long offset, byte[] data, long dataOffset, long dataLength)
         {
             if (dataLength < 0 || dataOffset < 0)
             {

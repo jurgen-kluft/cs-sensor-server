@@ -4,28 +4,25 @@ NOTE: Work in progress, nothing to see here, move along.
 
 Move the sensor server from Golang to C#/.NET for the following reasons:
 
-- It can do UDP, TCP, and Unix Domain Sockets
-- It can do memory mapped file I/O
-- Easy debugging with Visual Studio or VS Code
+- It does UDP, TCP, and Unix Domain Sockets
+- It does memory mapped file I/O
+- Easy debugging with Visual Studio, VS Code or Rider
 - Cross platform (Windows, Linux, MacOS)
-
 
 # Sensor Server
 
-A udp/tcp server for receiving sensor data in real-time and flushing them to disk in a custom structured format.
+A udp/tcp server for receiving sensor data in real-time and backing them to disk in a custom structured format.
 
 Some notes:
 
-- Every sensor is a data stream
 - Data is very minimal and it should be quite easy to load/use it in a visualization tool
-- TODO: Snappy is used upon writing, and reading data to/from disk
 - One or more (local) clients can connect through unix domain sockets to receive real-time data. 
   The data is a simple array of the following format:
   - `{uint16 Sensor Index, uint16 Sensor Value}`
 
 ## Status
 
-- Implemention is quite done
+- Implemention is WIP
   - ipc, udp and tcp server 
   - updating sensor streams with incoming sensor data
   - flushing sensor streams to disk
@@ -44,21 +41,29 @@ Some notes:
 
 ## Data Size
 
-Example for a Temperature sensor:
+Sensor data is stored when received, there is no fixed frequency of samples.
 
-Storing the temperature every minute for a year with 1 signed byte would require:
-```
-    1 byte * 1 (time per minute) * 60 (minutes per hour) * 24 (hours per day) * 365 (days per year) = 525,600 bytes = ~513 KB.
-    Note: Applying (snappy) compression would reduce this to about ~100 KB.
-```
-Note: That is ~100KB for one year, for one sensor.
+Each sample = type (uint16, 2 bytes), value (uint16, 2 bytes), time (uint32, 4 bytes) = 8 bytes total.
+Every month or so a 'TimeMarker' is inserted into the stream that 'resets' the time reference to 0.
+The 'time' field unit is in milliseconds since the last TimeMarker.
 
-Example for a Motion sensor:
+Calculation for a Temperature sensor:
 
-Storing the motion state twice a second for a year with 2 bits would require:
-```
-    2 bits * 2 (times per second) * 60 (seconds per minute) * 60 (minutes per hour) * 24 (hours per day) * 365 (days per year) = 63,072,000 bits = ~7.5 MB.
-    Note: Since there will be mostly large runs of 0 (or 1) bits, applying (snappy) compression would reduce this to about ~300 KB.
+```markdown
+Let's say we receive around 32 temperature samples per hour, and we project to run the sensor server for 1 year.
+Then the total amount of samples would be: 32 samples/hour * 24 hours/day * 365 days/year = 280320 samples/year.
+Each temperature sample is stored as a type (uint16, 2 bytes), a value (uint16, 2 bytes), and a time (uint32, 4 bytes), 
+so each sample takes 8 bytes.
+So the total data size for 1 year would be: 280320 samples/year * 8 bytes/sample = 2,242,560 bytes/year, or roughly 2 MB/year.
 ```
 
-Note: That is ~300KB for one year, for one motion sensor
+Calculation for a presence sensor:
+
+```markdown
+Let's say we receive around (average) 16 presence states per hour, and we project to run the sensor server for 1 year.
+Then the total amount of samples would be: 16 samples/hour * 24 hours/day * 365 days/year = 140160 samples/year.
+Each presence sample is stored as a type (uint16, 2 bytes), a value (uint16, 2 bytes), and a time (uint32, 4 bytes), 
+so each sample takes 8 bytes.
+So the total data size for 1 year would be: 140160 samples/year * 8 bytes/sample = 1,121,280 bytes/year, or roughly 1 MB/year.
+```
+

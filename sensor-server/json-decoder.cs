@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CorePkg
+namespace sensorserver
 {
 	public enum JsonValueType : sbyte
 	{
@@ -171,26 +171,17 @@ namespace CorePkg
 		}
 	}
 
-	public delegate void JsonDecode(JsonDecoder decoder);
-
 	public partial class JsonDecoder
 	{
-		public bool Decode(Dictionary<string, JsonDecode> fields)
+		public bool Decode(Dictionary<string, Action<JsonDecoder>> fields)
 		{
-			var (ok, end) = ReadUntilObjectEnd();
-			while (ok && !end)
+			while (!ReadUntilObjectEnd())
 			{
 				var fname = DecodeField();
 				if (fields.TryGetValue(fname.ToLowerInvariant(), out var fdecode))
 				{
 					fdecode(this);
 				}
-				(ok, end) = ReadUntilObjectEnd();
-			}
-			if (!ok && Error == null)
-			{
-				Error = new Exception($"error decoding JSON at {Context.Cursor}");
-				return false;
 			}
 			return true;
 		}
@@ -206,49 +197,53 @@ namespace CorePkg
 		public List<string> DecodeStringArray()
 		{
 			var outArray = new List<string>(4);
-			var (ok, end) = ReadUntilArrayEnd();
-			while (ok && !end)
+            while (!ReadUntilArrayEnd())
 			{
 				outArray.Add(DecodeString());
-				(ok, end) = ReadUntilArrayEnd();
 			}
 			return outArray;
 		}
 
 		public void DecodeArray(Action<JsonDecoder> decodeElement)
 		{
-			var (ok, end) = ReadUntilArrayEnd();
-			while (ok && !end)
+			while (!ReadUntilArrayEnd())
 			{
 				decodeElement(this);
-				(ok, end) = ReadUntilArrayEnd();
 			}
 		}
 
-		public List<List<string>> DecodeStringArray2D()
+		public List<List<string>> DecodeArrayArrayString()
 		{
 			var outArray = new List<List<string>>(4);
-			(bool ok, bool end) = ReadUntilArrayEnd();
-			while (ok && !end)
+            while (!ReadUntilArrayEnd())
 			{
 				outArray.Add(DecodeStringArray());
-				(ok, end) = ReadUntilArrayEnd();
 			}
 			return outArray;
 		}
 
-		public Dictionary<string, string> DecodeStringMapString()
+		public Dictionary<string, string> DecodeDictionaryStringString()
 		{
 			var outMap = new Dictionary<string, string>(4);
-			var (ok, end) = ReadUntilObjectEnd();
-			while (ok && !end)
+            while (!ReadUntilArrayEnd())
 			{
 				var key = DecodeField();
 				var value = DecodeString();
 				outMap[key] = value;
-				(ok, end) = ReadUntilObjectEnd();
 			}
 			return outMap;
+		}
+
+        public byte[] DecodeByteArray()
+		{
+			List<byte> outBytes = new();
+			while (!ReadUntilArrayEnd())
+			{
+				string str = DecodeString();
+                byte b = str.ParseByte((byte)0);
+				outBytes.Add(b);
+			}
+			return outBytes.ToArray();
 		}
 
 		public string FieldStr(JsonField f)
@@ -363,18 +358,16 @@ namespace CorePkg
 			return false;
 		}
 
-		public (bool ok, bool end) ReadUntilObjectEnd()
+		public bool ReadUntilObjectEnd()
 		{
 			bool ok = Read();
-            bool end = ok && (Key.Type == JsonValueType.JsonValueTypeObject && Value.Type == JsonValueType.JsonValueTypeEnd);
-			return (ok, end);
+            return ok && (Key.Type == JsonValueType.JsonValueTypeObject && Value.Type == JsonValueType.JsonValueTypeEnd);
 		}
 
-		public (bool ok, bool end) ReadUntilArrayEnd()
+		public bool ReadUntilArrayEnd()
 		{
 			bool ok = Read();
-            bool end = ok && (Key.Type == JsonValueType.JsonValueTypeArray && Value.Type == JsonValueType.JsonValueTypeEnd);
-			return (ok, end);
+            return ok && (Key.Type == JsonValueType.JsonValueTypeArray && Value.Type == JsonValueType.JsonValueTypeEnd);
 		}
 
 		public bool Read()

@@ -137,14 +137,29 @@ namespace sensorserver
     {
         static void Main(string[] args)
         {
-            int udpPort = 31370;
-            int tcpPort = 31372;
-            string udsPort = "/tmp/sensor_server.sock";
+            if (args.Length != 2)
+            {
+                Console.WriteLine("Usage: sensor-server <config_file>");
+                Environment.Exit(1);
+                return;
+            }
+
+            HouseState houseState = new HouseState();
+            if (!houseState.ReadConfiguration(args[1]))
+            {
+                Console.WriteLine("Failed to read configuration file!");
+                Environment.Exit(1);
+                return;
+            }
+
+            int udpPort = houseState.Configuration.UdpPort;
+            int tcpPort = houseState.Configuration.TcpPort;
+            string udsPort = houseState.Configuration.UdsPort;
 
             Console.WriteLine($"Servers: udp:{udpPort} tcp:{tcpPort}, uds:{udsPort}");
             Console.WriteLine();
 
-            // Creates new UDP/TCP and UDS servers
+            // Creates a new UDP, TCP and UDS server
             var udpServer = new UdpSensorServer(IPAddress.Any, udpPort);
             var tcpServer = new TcpSensorServer(IPAddress.Any, tcpPort);
             var udsServer = new UdsSensorServer(udsPort);

@@ -1,45 +1,76 @@
 using System;
 using System.Collections.Generic;
 
-namespace SensorServer
+namespace sensorserver
 {
-    public enum SensorType : byte
+    public enum SensorType : ushort
     {
-        Unknown = 0,      // Unknown sensor type
-        Temperature = 1,  // (s8, °C)
-        Humidity = 2,     // (s8, %)
-        Pressure = 3,     // (s16, hPa)
-        Light = 4,        // (s16, lux)
-        UV = 5,           // (s16, index)
-        CO = 6,           // (s16, ppm)
-        CO2 = 7,          // (s16, ppm)
-        HCHO = 8,         // (s16, ppm)
-        VOC = 9,          // (s16, ppm)
-        NOX = 10,         // (s16, ppm)
-        PM005 = 11,       // (s16, µg/m3)
-        PM010 = 12,       // (s16, µg/m3)
-        PM025 = 13,       // (s16, µg/m3)
-        PM040 = 14,       // (s16, µg/m3)
-        PM100 = 15,       // (s16, µg/m3)
-        Noise = 16,       // (s16, dB)
-        Vibration = 17,   // (s8, levels)
-        State = 18,       // (s32, sensor model/state)
-        Battery = 19,     // (u8, battery level)
-        Switch = 20,      // (u8, 0=none, 1=open, 2=close)
-        Presence1 = 21,   // (u8)
-        Presence2 = 22,   // (u8)
-        Presence3 = 23,   // (u8)
-        Distance1 = 24,   // (u16, cm)
-        Distance2 = 25,   // (u16, cm)
-        Distance3 = 26,   // (u16, cm)
-        X = 27,           // (s16, cm)
-        Y = 28,           // (s16, cm)
-        Z = 29,           // (s16, cm)
-        RSSI = 30,        // (s16, dBm)
-        Perf1 = 31,       // Performance Metric 1
-        Perf2 = 32,       // Performance Metric 2
-        Perf3 = 33,       // Performance Metric 3
-        SensorCount = 34  // Max number of sensor types
+        Unknown = 0,         // Unknown sensor type
+        Temperature = 1,     // (s8, °C)
+        Humidity = 2,        // (s8, %)
+        Pressure = 3,        // (s16, hPa)
+        Light = 4,           // (s16, lux)
+        UV = 5,              // (s16, index)
+        CO = 6,              // (s16, ppm)
+        CO2 = 7,             // (s16, ppm)
+        HCHO = 8,            // (s16, ppm)
+        VOC = 9,             // (s16, ppm)
+        NOX = 10,            // (s16, ppm)
+        PM005 = 11,          // (s16, µg/m3)
+        PM010 = 12,          // (s16, µg/m3)
+        PM025 = 13,          // (s16, µg/m3)
+        PM040 = 14,          // (s16, µg/m3)
+        PM100 = 15,          // (s16, µg/m3)
+        Noise = 16,          // (s16, dB)
+        Vibration = 17,      // (s8, Hz)
+        State = 18,          // (s32, sensor model/state)
+        Battery = 19,        // (u8, %)
+        Switch = 20,         // (u8, 0=none, 1=open, 2=close)
+        Presence1 = 21,      // (u8)
+        Presence2 = 22,      // (u8)
+        Presence3 = 23,      // (u8)
+        Distance1 = 24,      // (u16, cm)
+        Distance2 = 25,      // (u16, cm)
+        Distance3 = 26,      // (u16, cm)
+        X = 27,              // (s16, cm)
+        Y = 28,              // (s16, cm)
+        Z = 29,              // (s16, cm)
+        RSSI = 30,           // (s16, dBm)
+        Perf1 = 31,          // Performance Metric 1
+        Perf2 = 32,          // Performance Metric 2
+        Perf3 = 33,          // Performance Metric 3
+        TimeMarker = 0x8000, // Highest bit indicates a time marker, all the following bits are part of the timestamp
+    }
+
+    public enum SensorUnit : byte
+    {
+        None,
+        Celcius,
+        Fahrenheit,
+        Percent,
+        Hpa,
+        Lux,
+        Ppm,
+        UgPerM3,
+        Hz,
+        Db,
+        Dbm,
+        Centimeter,
+        Millimeter,
+        MicroMeter,
+        NanoMeter,
+        Hour,
+        Minute,
+        Second,
+        MilliSecond,
+        Volt,
+        MilliVolt,
+        MicroVolt,
+        Ampere,
+        MilliAmpere,
+        MicroAmpere,
+        Binary,
+        Ternary,
     }
 
     public enum SensorState : byte
@@ -183,45 +214,37 @@ namespace SensorServer
             { SensorType.Perf3, SensorFieldType.FieldTypeS16 }
         };
 
-        // Frequency constants in milliseconds
-        public const int OneEveryHalfSecond = 500;
-        public const int OneEverySecond = 1000;
-        public const int OneEveryHalfMinute = 30 * OneEverySecond;
-        public const int OneEveryMinute = 60 * OneEverySecond;
-        public const int OnePerTwoMinutes = 2 * OneEveryMinute;
-        public const int OneEveryTenSeconds = 10 * OneEverySecond;
-
-        public static readonly Dictionary<SensorType, int> SensorTypeToFrequency = new Dictionary<SensorType, int>
+        public static readonly Dictionary<SensorType, SensorUnit> SensorTypeToSensorUnit = new Dictionary<SensorType, SensorUnit>
         {
-            { SensorType.Unknown, OneEveryMinute },
-            { SensorType.Temperature, OneEveryMinute },
-            { SensorType.Humidity, OneEveryMinute },
-            { SensorType.Pressure, OneEveryMinute },
-            { SensorType.Light, OneEveryHalfMinute },
-            { SensorType.CO2, OnePerTwoMinutes },
-            { SensorType.VOC, OnePerTwoMinutes },
-            { SensorType.PM005, OnePerTwoMinutes },
-            { SensorType.PM010, OnePerTwoMinutes },
-            { SensorType.PM025, OnePerTwoMinutes },
-            { SensorType.PM100, OnePerTwoMinutes },
-            { SensorType.Noise, OneEveryTenSeconds },
-            { SensorType.UV, OneEveryMinute },
-            { SensorType.CO, OneEveryTenSeconds },
-            { SensorType.Vibration, OneEveryTenSeconds },
-            { SensorType.Switch, OneEveryHalfSecond },
-            { SensorType.Presence1, OneEveryHalfSecond },
-            { SensorType.Presence2, OneEveryHalfSecond },
-            { SensorType.Presence3, OneEveryHalfSecond },
-            { SensorType.Distance1, OneEveryHalfSecond },
-            { SensorType.Distance2, OneEveryHalfSecond },
-            { SensorType.Distance3, OneEveryHalfSecond },
-            { SensorType.X, OneEveryHalfSecond },
-            { SensorType.Y, OneEveryHalfSecond },
-            { SensorType.Z, OneEveryHalfSecond },
-            { SensorType.RSSI, OneEveryTenSeconds },
-            { SensorType.Perf1, OneEveryMinute },
-            { SensorType.Perf2, OneEveryMinute },
-            { SensorType.Perf3, OneEveryMinute }
+            { SensorType.Unknown, SensorUnit.None },
+            { SensorType.Temperature, SensorUnit.Celcius },
+            { SensorType.Humidity, SensorUnit.Percent },
+            { SensorType.Pressure, SensorUnit.Hpa },
+            { SensorType.Light, SensorUnit.Lux },
+            { SensorType.CO2, SensorUnit.Ppm },
+            { SensorType.VOC, SensorUnit.Ppm },
+            { SensorType.PM005, SensorUnit.UgPerM3 },
+            { SensorType.PM010, SensorUnit.UgPerM3 },
+            { SensorType.PM025, SensorUnit.UgPerM3 },
+            { SensorType.PM100, SensorUnit.UgPerM3 },
+            { SensorType.Noise, SensorUnit.Db },
+            { SensorType.UV, SensorUnit.NanoMeter },
+            { SensorType.CO, SensorUnit.Ppm },
+            { SensorType.Vibration, SensorUnit.Hz },
+            { SensorType.Switch, SensorUnit.Binary },
+            { SensorType.Presence1, SensorUnit.Binary },
+            { SensorType.Presence2, SensorUnit.Binary },
+            { SensorType.Presence3, SensorUnit.Binary },
+            { SensorType.Distance1, SensorUnit.Centimeter },
+            { SensorType.Distance2, SensorUnit.Centimeter },
+            { SensorType.Distance3, SensorUnit.Centimeter },
+            { SensorType.X, SensorUnit.Centimeter },
+            { SensorType.Y, SensorUnit.Centimeter },
+            { SensorType.Z, SensorUnit.Centimeter },
+            { SensorType.RSSI, SensorUnit.Dbm },
+            { SensorType.Perf1, SensorUnit.MilliSecond },
+            { SensorType.Perf2, SensorUnit.MilliSecond },
+            { SensorType.Perf3, SensorUnit.MilliSecond }
         };
     }
 }

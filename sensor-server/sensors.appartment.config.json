@@ -1,66 +1,306 @@
 {
-	"storage": "$HOME/sensor-server/appartment",
+	"storage_path": "$HOME/sensor-server/appartment.log",
+    "storage_size": 2147483648,
+    "state_path": "$HOME/sensor-server/state.log",
+    "state_size": 8182,
 	"tcp_port": 31372,
 	"udp_port": 31370,
-	"ipc_port": "/tmp/sensor-server.sock",
-	"flush": 300,
+	"uds_port": "/tmp/sensor-server.sock",
+	"flush": 60,
 	"sensors": [
-		{"index": 0, "name": "frontdoor", "mac": "00:00:00:00:00:01", "type": "openclose"},
-		{"index": 1, "name": "hallway_presence", "mac": "00:00:00:00:00:02", "type": "presence1"},
-
-		{"index": 20,"name": "kitchen_window", "mac": "00:00:00:00:00:03", "type": "openclose"},
-		{"index": 21,"name": "kitchen_presence", "mac": "00:00:00:00:00:04", "type": "presence1"},
-		{"index": 22,"name": "kitchen_temperature", "mac": "00:00:00:00:00:04", "type": "temperature"},
-		{"index": 23,"name": "kitchen_humidity", "mac": "00:00:00:00:00:04", "type": "humidity"},
-		{"index": 24,"name": "kitchen_co2", "mac": "00:00:00:00:00:04", "type": "co2"},
-		{"index": 25,"name": "kitchen_co", "mac": "00:00:00:00:00:04", "type": "co"},
-
-		{"index": 40,"name": "bathroom_door", "mac": "00:00:00:00:00:09", "type": "openclose"},
-		{"index": 41,"name": "bathroom_presence", "mac": "00:00:00:00:00:0A", "type": "presence1"},
-		{"index": 42,"name": "bathroom_temperature", "mac": "00:00:00:00:00:0A", "type": "temperature"},
-		{"index": 43,"name": "bathroom_humidity", "mac": "00:00:00:00:00:0A", "type": "humidity"},
-
-		{"index": 60,"name": "livingroom_balcony_door", "mac": "00:00:00:00:00:0D", "type": "openclose"},
-		{"index": 61,"name": "livingroom_presence", "mac": "00:00:00:00:00:0E", "type": "presence1"},
-		{"index": 62,"name": "livingroom_temperature", "mac": "14:2B:2F:E5:C8:94", "type": "temperature"},
-		{"index": 63,"name": "livingroom_pressure", "mac": "14:2B:2F:E5:C8:94", "type": "pressure"},
-		{"index": 63,"name": "livingroom_humidity", "mac": "14:2B:2F:E5:C8:94", "type": "humidity"},
-		{"index": 64,"name": "livingroom_luminance", "mac": "14:2B:2F:E5:C8:94", "type": "light"},
-		{"index": 65,"name": "livingroom_co2", "mac": "14:2B:2F:E5:C8:94", "type": "co2"},
-
-		{"index": 80, "name": "sophiaroom_door", "mac": "00:00:00:00:00:12", "type": "openclose"},
-		{"index": 81, "name": "sophiaroom_window", "mac": "00:00:00:00:00:13", "type": "openclose"},
-		{"index": 82, "name": "sophiaroom_presence", "mac": "00:00:00:00:00:14", "type": "presence1"},
-		{"index": 83, "name": "sophiaroom_temperature", "mac": "00:00:00:00:00:14", "type": "temperature"},
-		{"index": 84, "name": "sophiaroom_humidity", "mac": "00:00:00:00:00:14", "type": "humidity"},
-		{"index": 85, "name": "sophiaroom_luminance", "mac": "00:00:00:00:00:14", "type": "light"},
-		{"index": 86, "name": "sophiaroom_co2", "mac": "00:00:00:00:00:14", "type": "co2"},
-
-		{"index": 100, "name": "jenniferroom_door", "mac": "00:00:00:00:00:19", "type": "openclose"},
-		{"index": 101, "name": "jenniferroom_window", "mac": "00:00:00:00:00:1A", "type": "openclose"},
-		{"index": 102, "name": "jenniferroom_presence", "mac": "00:00:00:00:00:1B", "type": "presence1"},
-		{"index": 103, "name": "jenniferroom_temperature", "mac": "00:00:00:00:00:1B", "type": "temperature"},
-		{"index": 104, "name": "jenniferroom_humidity", "mac": "00:00:00:00:00:1B", "type": "humidity"},
-		{"index": 105, "name": "jenniferroom_luminance", "mac": "00:00:00:00:00:1B", "type": "light"},
-		{"index": 106, "name": "jenniferroom_co2", "mac": "00:00:00:00:00:1B", "type": "co2"},
-
-		{"index": 140,"name": "mainbedroom_door", "mac": "00:00:00:00:00:20", "type": "openclose"},
-		{"index": 141,"name": "mainbedroom_balcony_door", "mac": "00:00:00:00:00:21", "type": "openclose"},
-		{"index": 142,"name": "mainbedroom_presence", "mac": "00:00:00:00:00:22", "type": "presence1"},
-		{"index": 143,"name": "mainbedroom_temperature", "mac": "00:00:00:00:00:22", "type": "temperature"},
-		{"index": 144,"name": "mainbedroom_humidity", "mac": "00:00:00:00:00:22", "type": "humidity"},
-		{"index": 145,"name": "mainbedroom_luminance", "mac": "00:00:00:00:00:22", "type": "light"},
-		{"index": 146,"name": "mainbedroom_co2", "mac": "00:00:00:00:00:22", "type": "co2"},
-
-		{"index": 160,"name": "mainbathroom_door", "mac": "00:00:00:00:00:27", "type": "openclose"},
-		{"index": 161,"name": "mainbathroom_presence", "mac": "00:00:00:00:00:28", "type": "presence1"},
-		{"index": 162,"name": "mainbathroom_temperature", "mac": "00:00:00:00:00:28", "type": "temperature"},
-		{"index": 163,"name": "mainbathroom_humidity", "mac": "00:00:00:00:00:28", "type": "humidity"},
-
-		{"index": 200,"name": "kitchen_rssi", "mac": "00:00:00:00:00:04", "type": "rssi"},
-		{"index": 201,"name": "sophiaroom_rssi", "mac": "00:00:00:00:00:14", "type": "rssi"},
-		{"index": 202,"name": "jenniferroom_rssi", "mac": "00:00:00:00:00:1B", "type": "rssi"},
-		{"index": 204,"name": "mainbedroom_rssi", "mac": "00:00:00:00:00:22", "type": "rssi"},
-		{"index": 204,"name": "mainbathroom_rssi", "mac": "00:00:00:00:00:28", "type": "rssi"}
+		{
+			"name": "door",
+			"location": "frontdoor",
+			"mac": "00:00:00:00:00:01",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "frontdoor",
+			"mac": "00:00:00:00:00:02",
+			"type": "presence1"
+		},
+		{
+			"name": "window",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:03",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:04",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:04",
+			"type": "temperature"
+		},
+		{
+			"name": "humidity",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:04",
+			"type": "humidity"
+		},
+		{
+			"name": "carbon dioxide",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:04",
+			"type": "co2"
+		},
+		{
+			"name": "carbon oxide",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:04",
+			"type": "co"
+		},
+		{
+			"name": "door",
+			"location": "bathroom",
+			"mac": "00:00:00:00:00:09",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "bathroom",
+			"mac": "00:00:00:00:00:0A",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "bathroom",
+			"mac": "00:00:00:00:00:0A",
+			"type": "temperature"
+		},
+		{
+			"name": "humidity",
+			"location": "bathroom",
+			"mac": "00:00:00:00:00:0A",
+			"type": "humidity"
+		},
+		{
+			"name": "balcony door",
+			"location": "livingroom balcony",
+			"mac": "00:00:00:00:00:0D",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "livingroom",
+			"mac": "00:00:00:00:00:0E",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "livingroom",
+			"mac": "14:2B:2F:E5:C8:94",
+			"type": "temperature"
+		},
+		{
+			"name": "pressure",
+			"location": "livingroom",
+			"mac": "14:2B:2F:E5:C8:94",
+			"type": "pressure"
+		},
+		{
+			"name": "humidity",
+			"location": "livingroom",
+			"mac": "14:2B:2F:E5:C8:94",
+			"type": "humidity"
+		},
+		{
+			"name": "luminance",
+			"location": "livingroom",
+			"mac": "14:2B:2F:E5:C8:94",
+			"type": "light"
+		},
+		{
+			"name": "carbon dioxide",
+			"location": "livingroom",
+			"mac": "14:2B:2F:E5:C8:94",
+			"type": "co2"
+		},
+		{
+			"name": "door",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:12",
+			"type": "openclose"
+		},
+		{
+			"name": "window",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:13",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:14",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:14",
+			"type": "temperature"
+		},
+		{
+			"name": "humidity",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:14",
+			"type": "humidity"
+		},
+		{
+			"name": "luminance",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:14",
+			"type": "light"
+		},
+		{
+			"name": "carbon dioxide",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:14",
+			"type": "co2"
+		},
+		{
+			"name": "door",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:19",
+			"type": "openclose"
+		},
+		{
+			"name": "window",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1A",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1B",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1B",
+			"type": "temperature"
+		},
+		{
+			"name": "humidity",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1B",
+			"type": "humidity"
+		},
+		{
+			"name": "luminance",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1B",
+			"type": "light"
+		},
+		{
+			"name": "carbon dioxide",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1B",
+			"type": "co2"
+		},
+		{
+			"name": "door",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:20",
+			"type": "openclose"
+		},
+		{
+			"name": "balcony.door",
+			"location": "main bedroom balcony",
+			"mac": "00:00:00:00:00:21",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:22",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:22",
+			"type": "temperature"
+		},
+		{
+			"name": "humidity",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:22",
+			"type": "humidity"
+		},
+		{
+			"name": "luminance",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:22",
+			"type": "light"
+		},
+		{
+			"name": "carbon dioxide",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:22",
+			"type": "co2"
+		},
+		{
+			"name": "door",
+			"location": "main bathroom",
+			"mac": "00:00:00:00:00:27",
+			"type": "openclose"
+		},
+		{
+			"name": "presence",
+			"location": "main bathroom",
+			"mac": "00:00:00:00:00:28",
+			"type": "presence1"
+		},
+		{
+			"name": "temperature",
+			"location": "main bathroom",
+			"mac": "00:00:00:00:00:28",
+			"type": "temperature"
+		},
+		{
+			"name": "humidity",
+			"location": "main bathroom",
+			"mac": "00:00:00:00:00:28",
+			"type": "humidity"
+		},
+		{
+			"name": "rssi",
+			"location": "kitchen",
+			"mac": "00:00:00:00:00:04",
+			"type": "rssi"
+		},
+		{
+			"name": "rssi",
+			"location": "sophia room",
+			"mac": "00:00:00:00:00:14",
+			"type": "rssi"
+		},
+		{
+			"name": "rssi",
+			"location": "jennifer room",
+			"mac": "00:00:00:00:00:1B",
+			"type": "rssi"
+		},
+		{
+			"name": "rssi",
+			"location": "main bedroom",
+			"mac": "00:00:00:00:00:22",
+			"type": "rssi"
+		},
+		{
+			"name": "rssi",
+			"location": "main bathroom",
+			"mac": "00:00:00:00:00:28",
+			"type": "rssi"
+		}
 	]
 }

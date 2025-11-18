@@ -25,7 +25,8 @@ namespace sensorserver
 
         public bool OpenReadWrite()
         {
-            FileStream fileStream = new(sFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            const FileOptions fileOptions = FileOptions.WriteThrough | FileOptions.SequentialScan;
+            FileStream fileStream = new(sFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite, 4096, fileOptions);
 
             mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.ReadWrite);
@@ -44,6 +45,7 @@ namespace sensorserver
             FileStream fileStream = new(sFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.Read);
+            mWriteCursor = -1; // Not used in read-only mode
             return true;
         }
 
@@ -54,13 +56,23 @@ namespace sensorserver
 
         public bool Append(byte[] data, long dataOffset, long dataLength)
         {
-            if (dataLength < 0 || dataOffset < 0 || (mWriteCursor + dataLength) > sMaxSize)
+            if (mWriteCursor<0 || dataLength < 0 || dataOffset < 0 || (mWriteCursor + dataLength) > sMaxSize)
             {
                 return false;
             }
             mAccessor.WriteArray(mWriteCursor, data, (int)dataOffset, (int)dataLength);
             mAccessor.Write(0, mWriteCursor + dataLength); // Update write cursor at start of file
             mWriteCursor += dataLength;
+            return true;
+        }
+
+        public bool Read(long readOffset, byte[] data, long dataOffset, long dataLength)
+        {
+            if (dataLength < 0 || dataOffset < 0 || readOffset < 8 || (readOffset + dataLength) > sMaxSize)
+            {
+                return false;
+            }
+            mAccessor.ReadArray(readOffset, data, (int)dataOffset, (int)dataLength);
             return true;
         }
 
