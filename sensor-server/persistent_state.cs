@@ -1,23 +1,26 @@
+using System.IO;
 using System.IO.MemoryMappedFiles;
 
 namespace sensorserver
 {
     public class PersistentState
     {
-        private readonly MemoryMappedFile mMemoryMappedFile;
-        private readonly MemoryMappedViewAccessor mAccessor;
+        private MemoryMappedFile mMemoryMappedFile;
+        private MemoryMappedViewAccessor mAccessor;
         private readonly long sMaxSize;
+        private readonly string mFilePath;
 
         public PersistentState(string filePath, long maxSize)
         {
             // Create the file on disk if it doesn't exist and fill it with zeros
+            mFilePath  = filePath;
             sMaxSize = maxSize;
         }
 
         public bool OpenReadWrite()
         {
-            FileStream fileStream = new(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-            fileStream.SetLength(maxSize);
+            FileStream fileStream = new(mFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            fileStream.SetLength(sMaxSize);
             mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.ReadWrite);
             return true;
@@ -25,7 +28,7 @@ namespace sensorserver
 
         public bool OpenReadOnly()
         {
-            FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            FileStream fileStream = new(mFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.Read);
             return true;

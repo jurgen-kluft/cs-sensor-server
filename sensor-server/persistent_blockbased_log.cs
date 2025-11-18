@@ -38,8 +38,8 @@ namespace sensorserver
 
         private readonly string sFilePath;
         private readonly long sMaxSize;
-        private readonly MemoryMappedFile mMemoryMappedFile;
-        private readonly MemoryMappedViewAccessor mAccessor;
+        private MemoryMappedFile mMemoryMappedFile;
+        private MemoryMappedViewAccessor mAccessor;
         private long mBlockCount;
         private long mAppendCursor;
 
@@ -55,7 +55,7 @@ namespace sensorserver
             public Int64 Offset { get; set; }
             public Int64 Size { get; set; }
         }
-        private readonly Dictionary<BlockId, BlockInfo> mBlockOffsetMap;
+        private Dictionary<BlockId, BlockInfo> mBlockOffsetMap;
 
         public StreamBlockLog(string filePath, long maxSize)
         {
@@ -67,7 +67,6 @@ namespace sensorserver
         public bool OpenReadWrite()
         {
             FileStream fileStream = new(sFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-            fileStream.SetLength(maxSize);
 
             mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.ReadWrite);
@@ -76,11 +75,12 @@ namespace sensorserver
             mAppendCursor = mAccessor.ReadInt64(8); // Read append cursor after block count
             if (mBlockCount < 0 || mBlockCount >= sMaxBlockCount)
             {
-                mBlockCount = 0; // Initialize block count 
+                mBlockCount = 0; // Initialize block count
                 mAppendCursor = sLogHeaderSize + sSizeOfToc; // Initialize append cursor after header and TOC
             }
 
             ReadTocEntries();
+            return true;
         }
 
         public bool OpenReadOnly()
@@ -90,7 +90,7 @@ namespace sensorserver
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.Read);
 
             mBlockCount = mAccessor.ReadInt64(0); // Read block count at start of file
-            
+
             ReadTocEntries();
 
             return true;
@@ -110,7 +110,7 @@ namespace sensorserver
                     Size = mAccessor.ReadInt64(tocOffset + 24)
                 };
                 mBlockOffsetMap[tocEntry] = blockInfo;
-            }            
+            }
         }
 
         private void Flush()

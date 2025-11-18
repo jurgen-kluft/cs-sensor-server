@@ -1,7 +1,7 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using NetCoreServer;
 
 namespace sensorserver
 {
@@ -53,7 +53,7 @@ namespace sensorserver
             Console.WriteLine($"Unix Domain Socket server caught an error with code {error}");
         }
     }
-    
+
     class UdpSensorServer : UdpServer
     {
         public UdpSensorServer(IPAddress address, int port) : base(address, port) { }
@@ -145,7 +145,7 @@ namespace sensorserver
             Console.WriteLine();
 
             // Creates new UDP/TCP and UDS servers
-            var udpServer = new UdpSensorServer(IPAddress.Any, port);
+            var udpServer = new UdpSensorServer(IPAddress.Any, udpPort);
             var tcpServer = new TcpSensorServer(IPAddress.Any, tcpPort);
             var udsServer = new UdsSensorServer(udsPort);
 

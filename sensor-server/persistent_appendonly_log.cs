@@ -1,17 +1,18 @@
+using System.IO;
 using System.IO.MemoryMappedFiles;
 
 namespace sensorserver
 {
     // Notes:
     //   - Receiving the sensor data packets from TCP or UDP is written
-    //     directly into a sensor data packet log. This is mainly done to 
+    //     directly into a sensor data packet log. This is mainly done to
     //     facilitate debugging and analysis of incoming data. We are also
     //     later able to reconstruct the sensor blocks from the packet log.
     //
     public class PersistentAppendOnlyLog
     {
-        private readonly MemoryMappedFile mMemoryMappedFile;
-        private readonly MemoryMappedViewAccessor mAccessor;
+        private MemoryMappedFile mMemoryMappedFile;
+        private MemoryMappedViewAccessor mAccessor;
         private readonly string sFilePath;
         private readonly long sMaxSize;
         private long mWriteCursor;
@@ -25,7 +26,6 @@ namespace sensorserver
         public bool OpenReadWrite()
         {
             FileStream fileStream = new(sFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-            fileStream.SetLength(maxSize);
 
             mMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, null, sMaxSize, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
             mAccessor = mMemoryMappedFile.CreateViewAccessor(0, sMaxSize, MemoryMappedFileAccess.ReadWrite);
@@ -35,6 +35,8 @@ namespace sensorserver
             {
                 mWriteCursor = 8; // Initialize write cursor after header
             }
+
+            return true;
         }
 
         public bool OpenReadOnly()
